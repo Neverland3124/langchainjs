@@ -88,6 +88,7 @@ const entrypoints = {
   prompts: "prompts/index",
   "prompts/load": "prompts/load",
   // vectorstores
+  "vectorstores/clickhouse": "vectorstores/clickhouse",
   "vectorstores/analyticdb": "vectorstores/analyticdb",
   "vectorstores/base": "vectorstores/base",
   "vectorstores/cassandra": "vectorstores/cassandra",

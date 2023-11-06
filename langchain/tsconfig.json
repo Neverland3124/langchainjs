@@ -103,6 +103,7 @@
       "src/llms/fake.ts",
       "src/prompts/index.ts",
       "src/prompts/load.ts",
+      "src/vectorstores/faiss.ts",
       "src/vectorstores/analyticdb.ts",
       "src/vectorstores/base.ts",
       "src/vectorstores/cassandra.ts",
