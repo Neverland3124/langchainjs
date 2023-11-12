@@ -6,7 +6,7 @@ import { VectorStore } from "./base.js";
 import { Document } from "../document.js";
 
 /**
- * Arguments for the ClickHouse class, which include the host, port,
+ * Arguments for the ClickHouseStore class, which include the host, port,
  * protocol, username, password, index type, index parameters, index query params, column map,
  * database, table, and metric.
  */
@@ -32,7 +32,6 @@ export interface ClickHouseLibArgs {
     id: string;
     uuid: string,
     document: string,
-    // TODO: what is the correct type?
     embedding: string,
     metadata: string;
   }
@@ -62,7 +61,6 @@ export class ClickHouseStore extends VectorStore {
 
   private indexType: string;
 
-  // TODO: what is the type of indexParam?
   private indexParam: Record<string, string>;
 
   private indexQueryParams: Record<string, string>;
@@ -147,7 +145,7 @@ export class ClickHouseStore extends VectorStore {
   async similaritySearchVectorWithScore(
     query: number[],
     k: number,
-    filter?: ClickHouseFilter
+    filter?: this["FilterType"]
   ): Promise<[Document, number][]> {
     if (!this.isInitialized) {
       await this.initialize(query.length);
@@ -235,23 +233,11 @@ export class ClickHouseStore extends VectorStore {
    private async initialize(dimension?: number): Promise<void> {
     const dim = dimension ?? (await this.embeddings.embedQuery("test")).length;
 
-    let indexParamStr = "";
-    for (const [key, value] of Object.entries(this.indexParam)) {
-      indexParamStr += `, '${key}=${value}'`;
-    }
-
-    // TODO: need to fix this after know the type of indexParam
-    // let indexParamStr = (() => {
-    //   if (typeof this.indexQueryParams === "object") {
-    //       return Object.entries(this.indexQueryParams)
-    //           .map(([key, value]) => `${key}=${value}`)
-    //           .join(",");
-    //   } else if (Array.isArray(this.indexQueryParams)) {
-    //       return this.indexQueryParams.join(",");
-    //   } else {
-    //       return this.indexQueryParams;
-    //   }
-    // })();
+    let indexParamStr = (() => {
+      return Object.entries(this.indexQueryParams)
+          .map(([key, value]) => `${key}=${value}`)
+          .join(",");
+    })();
 
     const query = `
       CREATE TABLE IF NOT EXISTS ${this.database}.${this.table}(
@@ -279,22 +265,7 @@ export class ClickHouseStore extends VectorStore {
     this.isInitialized = true;
   }
 
-
-//   def _build_insert_sql(self, transac: Iterable, column_names: Iterable[str]) -> str:
-//   ks = ",".join(column_names)
-//   _data = []
-//   for n in transac:
-//       n = ",".join([f"'{self.escape_str(str(_n))}'" for _n in n])
-//       _data.append(f"({n})")
-//   i_str = f"""
-//           INSERT INTO TABLE 
-//               {self.config.database}.{self.config.table}({ks})
-//           VALUES
-//           {','.join(_data)}
-//           """
-//   return i_str
-
-   /**
+  /**
    * Method to build an SQL query for inserting vectors and documents into
    * the ClickHouse database.
    * @param vectors The vectors to insert.
@@ -346,12 +317,20 @@ export class ClickHouseStore extends VectorStore {
     const order = "ASC";
 
     const whereStr = filter ? `PREWHERE ${filter.whereStr}` : "";
+
+    const settingStrings: string[] = [];
+    if (this.indexQueryParams) {
+        for (const [key, value] of Object.entries(this.indexQueryParams)) {
+          settingStrings.push(`SETTING ${key}=${value}`);
+        }
+    }
+
     return `
       SELECT ${this.columnMap.document} AS text, ${this.columnMap.metadata} AS metadata, dist
       FROM ${this.database}.${this.table}
       ${whereStr}
       ORDER BY L2Distance(${this.columnMap.embedding}, [${query}]) AS dist ${order}
-      LIMIT ${k}
+      LIMIT ${k} ${settingStrings.join(' ')}
     `;
   }
 }
