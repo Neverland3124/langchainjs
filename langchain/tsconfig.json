@@ -116,7 +116,7 @@
       "src/vectorstores/chroma.ts",
       "src/vectorstores/googlevertexai.ts",
       "src/vectorstores/hnswlib.ts",
-      "src/vectorstores/faiss.ts",
+      "src/vectorstores/clickhouse.ts",
       "src/vectorstores/weaviate.ts",
       "src/vectorstores/lancedb.ts",
       "src/vectorstores/momento_vector_index.ts",
