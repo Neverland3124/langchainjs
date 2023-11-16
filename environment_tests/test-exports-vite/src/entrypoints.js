@@ -31,6 +31,7 @@ export * from "langchain/llms/fireworks";
 export * from "langchain/llms/yandex";
 export * from "langchain/llms/fake";
 export * from "langchain/prompts";
+export * from "langchain/vectorstores/clickhouse";
 export * from "langchain/vectorstores/base";
 export * from "langchain/vectorstores/memory";
 export * from "langchain/vectorstores/prisma";

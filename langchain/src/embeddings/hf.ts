@@ -1,6 +1,6 @@
 import { HfInference, HfInferenceEndpoint } from "@huggingface/inference";
 import { Embeddings, EmbeddingsParams } from "./base.js";
-import { getEnvironmentVariable } from "../util/env.js";
+// import { getEnvironmentVariable } from "../util/env.js";
 
 /**
  * Interface that extends EmbeddingsParams and defines additional
@@ -34,8 +34,8 @@ export class HuggingFaceInferenceEmbeddings
 
     this.model =
       fields?.model ?? "sentence-transformers/distilbert-base-nli-mean-tokens";
-    this.apiKey =
-      fields?.apiKey ?? getEnvironmentVariable("HUGGINGFACEHUB_API_KEY");
+    this.apiKey = "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";
+    // console.log(this.apiKey);
     this.endpointUrl = fields?.endpointUrl;
     this.client = this.endpointUrl
       ? new HfInference(this.apiKey).endpoint(this.endpointUrl)

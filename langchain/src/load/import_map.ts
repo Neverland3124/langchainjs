@@ -32,6 +32,7 @@ export * as llms__fireworks from "../llms/fireworks.js";
 export * as llms__yandex from "../llms/yandex.js";
 export * as llms__fake from "../llms/fake.js";
 export * as prompts from "../prompts/index.js";
+export * as vectorstores__clickhouse from "../vectorstores/clickhouse.js";
 export * as vectorstores__base from "../vectorstores/base.js";
 export * as vectorstores__memory from "../vectorstores/memory.js";
 export * as vectorstores__prisma from "../vectorstores/prisma.js";
