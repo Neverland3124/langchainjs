@@ -5,7 +5,6 @@ import { Embeddings } from "../embeddings/base.js";
 import { VectorStore } from "./base.js";
 import { Document } from "../document.js";
 
-
 /**
  * Arguments for the ClickHouseStore class, which include the host, port,
  * protocol, username, password, index type, index parameters, index query params, column map,
@@ -63,15 +62,15 @@ export class ClickHouseStore extends VectorStore {
   private indexType: string;
 
   private indexParam: Record<string, number>;
-  
+
   private indexQueryParams: Record<string, string>;
-  
+
   private columnMap: ColumnMap;
-  
+
   private database: string;
-  
+
   private table: string;
-  
+
   // TODO: Verify we don't need metric and delete all metric
   // private metric: metric;
 
@@ -85,7 +84,7 @@ export class ClickHouseStore extends VectorStore {
     super(embeddings, args);
 
     this.indexType = args.indexType || "annoy";
-    this.indexParam = args.indexParam || { "L2Distance": 100 };
+    this.indexParam = args.indexParam || { L2Distance: 100 };
     this.indexQueryParams = args.indexQueryParams || {};
     this.columnMap = args.columnMap || {
       id: "id",
@@ -257,13 +256,13 @@ export class ClickHouseStore extends VectorStore {
     const dim = dimension ?? (await this.embeddings.embedQuery("test")).length;
     // await this.client.exec({ query: "DROP TABLE IF EXISTS vector_table;" });
 
-    console.log("this.indexParam", this.indexParam)
+    console.log("this.indexParam", this.indexParam);
     const indexParamStr = this.indexParam
       ? Object.entries(this.indexParam)
           .map(([key, value]) => `'${key}', ${value}`)
           .join(", ")
       : "";
-    console.log("indexParamStr", indexParamStr)
+    console.log("indexParamStr", indexParamStr);
 
     const query = `
     CREATE TABLE IF NOT EXISTS ${this.database}.${this.table}(

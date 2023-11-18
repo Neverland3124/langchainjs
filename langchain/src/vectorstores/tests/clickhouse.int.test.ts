@@ -62,12 +62,12 @@ test("ClickHouseStore.fromExistingIndex", async () => {
   const vectorStore = await ClickHouseStore.fromExistingIndex(
     new HuggingFaceInferenceEmbeddings(),
     {
-        host: process.env.CLICKHOUSE_HOST || "localhost",
-        port: process.env.CLICKHOUSE_PORT || "8443",
-        username: process.env.CLICKHOUSE_USERNAME || "username",
-        password: process.env.CLICKHOUSE_PASSWORD || "password",
-        table: "test_table",
-      }
+      host: process.env.CLICKHOUSE_HOST || "localhost",
+      port: process.env.CLICKHOUSE_PORT || "8443",
+      username: process.env.CLICKHOUSE_USERNAME || "username",
+      password: process.env.CLICKHOUSE_PASSWORD || "password",
+      table: "test_table",
+    }
   );
 
   const results = await vectorStore.similaritySearch("hello world", 1);
