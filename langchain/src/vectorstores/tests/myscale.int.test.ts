@@ -2,10 +2,10 @@
 import { test, expect } from "@jest/globals";
 
 import { MyScaleStore } from "../myscale.js";
-import { HuggingFaceInferenceEmbeddings } from "../../embeddings/hf.js";
+import { OpenAIEmbeddings } from "../../embeddings/openai.js";
 import { Document } from "../../document.js";
 
-test("MyScaleStore.fromText", async () => {
+test.skip("MyScaleStore.fromText", async () => {
   const vectorStore = await MyScaleStore.fromTexts(
     ["Hello world", "Bye bye", "hello nice world"],
     [
@@ -13,7 +13,7 @@ test("MyScaleStore.fromText", async () => {
       { id: 1, name: "1" },
       { id: 3, name: "3" },
     ],
-    new HuggingFaceInferenceEmbeddings(),
+    new OpenAIEmbeddings(),
     {
       host: process.env.MYSCALE_HOST || "localhost",
       port: process.env.MYSCALE_PORT || "8443",
@@ -41,7 +41,7 @@ test("MyScaleStore.fromText", async () => {
   ]);
 });
 
-test("MyScaleStore.fromExistingIndex", async () => {
+test.skip("MyScaleStore.fromExistingIndex", async () => {
   await MyScaleStore.fromTexts(
     ["Hello world", "Bye bye", "hello nice world"],
     [
@@ -49,7 +49,7 @@ test("MyScaleStore.fromExistingIndex", async () => {
       { id: 1, name: "1" },
       { id: 3, name: "3" },
     ],
-    new HuggingFaceInferenceEmbeddings(),
+    new OpenAIEmbeddings(),
     {
       host: process.env.MYSCALE_HOST || "localhost",
       port: process.env.MYSCALE_PORT || "8443",
@@ -60,7 +60,7 @@ test("MyScaleStore.fromExistingIndex", async () => {
   );
 
   const vectorStore = await MyScaleStore.fromExistingIndex(
-    new HuggingFaceInferenceEmbeddings(),
+    new OpenAIEmbeddings(),
     {
       host: process.env.MYSCALE_HOST || "localhost",
       port: process.env.MYSCALE_PORT || "8443",

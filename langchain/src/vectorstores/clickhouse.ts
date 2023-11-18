@@ -244,7 +244,6 @@ export class ClickHouseStore extends VectorStore {
    */
   private async initialize(dimension?: number): Promise<void> {
     const dim = dimension ?? (await this.embeddings.embedQuery("test")).length;
-    // await this.client.exec({ query: "DROP TABLE IF EXISTS vector_table;" });
 
     console.log("this.indexParam", this.indexParam);
     const indexParamStr = this.indexParam
