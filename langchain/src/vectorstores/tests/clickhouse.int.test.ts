@@ -2,7 +2,7 @@
 import { test, expect } from "@jest/globals";
 
 import { ClickHouseStore } from "../clickhouse.js";
-import { HuggingFaceInferenceEmbeddings } from "langchain/embeddings/hf";
+import { HuggingFaceInferenceEmbeddings } from "../../embeddings/hf.js";
 import { Document } from "../../document.js";
 
 test("ClickHouseStore.fromText", async () => {
@@ -62,12 +62,12 @@ test("ClickHouseStore.fromExistingIndex", async () => {
   const vectorStore = await ClickHouseStore.fromExistingIndex(
     new HuggingFaceInferenceEmbeddings(),
     {
-      host: process.env.MYSCALE_HOST || "localhost",
-      port: process.env.MYSCALE_PORT || "8443",
-      username: process.env.MYSCALE_USERNAME || "username",
-      password: process.env.MYSCALE_PASSWORD || "password",
-      table: "test_table",
-    }
+        host: process.env.CLICKHOUSE_HOST || "localhost",
+        port: process.env.CLICKHOUSE_PORT || "8443",
+        username: process.env.CLICKHOUSE_USERNAME || "username",
+        password: process.env.CLICKHOUSE_PASSWORD || "password",
+        table: "test_table",
+      }
   );
 
   const results = await vectorStore.similaritySearch("hello world", 1);

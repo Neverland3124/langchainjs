@@ -2,7 +2,7 @@
 import { test, expect } from "@jest/globals";
 
 import { MyScaleStore } from "../myscale.js";
-import { HuggingFaceInferenceEmbeddings } from "langchain/embeddings/hf";
+import { HuggingFaceInferenceEmbeddings } from "../../embeddings/hf.js";
 import { Document } from "../../document.js";
 
 test("MyScaleStore.fromText", async () => {
