@@ -7,8 +7,8 @@ import { Document } from "../document.js";
 
 /**
  * Arguments for the ClickHouseStore class, which include the host, port,
- * protocol, username, password, index type, index parameters, index query params, column map,
- * database, table, and metric.
+ * protocol, username, password, index type, index parameters, 
+ * index query params, column map, database, table.
  */
 export interface ClickHouseLibArgs {
   host: string;
@@ -22,7 +22,6 @@ export interface ClickHouseLibArgs {
   columnMap?: ColumnMap;
   database?: string;
   table?: string;
-  // metric?: metric;
 }
 
 /**
@@ -35,11 +34,6 @@ export interface ColumnMap {
   embedding: string;
   metadata: string;
 }
-
-/**
- * Type of metric used in the ClickHouse database.
- */
-export type metric = "angular" | "euclidean" | "manhattan" | "hamming" | "dot";
 
 /**
  * Type for filtering search results in the ClickHouse database.
@@ -71,9 +65,6 @@ export class ClickHouseStore extends VectorStore {
 
   private table: string;
 
-  // TODO: Verify we don't need metric and delete all metric
-  // private metric: metric;
-
   private isInitialized = false;
 
   _vectorstoreType(): string {
@@ -95,7 +86,6 @@ export class ClickHouseStore extends VectorStore {
     };
     this.database = args.database || "default";
     this.table = args.table || "vector_table";
-    // this.metric = args.metric || "angular";
 
     console.log(
       "everything",
@@ -296,7 +286,7 @@ export class ClickHouseStore extends VectorStore {
    * @returns The SQL query string.
    */
   private buildInsertQuery(vectors: number[][], documents: Document[]): string {
-    const columnsStr = Object.values(this.columnMap).join(", ");
+    // const columnsStr = Object.values(this.columnMap).join(", ");
 
     const data: string[] = [];
     for (let i = 0; i < vectors.length; i += 1) {
@@ -308,7 +298,7 @@ export class ClickHouseStore extends VectorStore {
         `'${this.escapeString(document.pageContent)}'`,
         `[${vector}]`,
         `'${JSON.stringify(document.metadata)}'`,
-        `'${uuid.v4()}'`,
+        // `'${uuid.v4()}'`,
       ].join(", ");
       data.push(`(${item})`);
     }
@@ -317,7 +307,7 @@ export class ClickHouseStore extends VectorStore {
     console.log("end buildInsertQuery");
     return `
       INSERT INTO TABLE
-        ${this.database}.${this.table}(${columnsStr})
+        ${this.database}.${this.table}("id", "document", "embedding", "metadata")
       VALUES
         ${dataStr}
     `;
