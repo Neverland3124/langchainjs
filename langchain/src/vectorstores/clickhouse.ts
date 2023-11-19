@@ -87,23 +87,12 @@ export class ClickHouseStore extends VectorStore {
     this.database = args.database || "default";
     this.table = args.table || "vector_table";
 
-    console.log(
-      "everything",
-      args,
-      this.columnMap,
-      this.indexQueryParams,
-      this.database,
-      this.table,
-      this.indexType
-    );
-
     this.client = createClient({
       host: `${args.protocol ?? "https://"}${args.host}:${args.port}`,
       username: args.username,
       password: args.password,
       session_id: uuid.v4(),
     });
-    console.log("done");
   }
 
   /**
@@ -113,19 +102,15 @@ export class ClickHouseStore extends VectorStore {
    * @returns Promise that resolves when the vectors have been added.
    */
   async addVectors(vectors: number[][], documents: Document[]): Promise<void> {
-    console.log("addVectors", documents);
     if (vectors.length === 0) {
       return;
     }
 
-    console.log("this.isInitialized", this.isInitialized);
     if (!this.isInitialized) {
       await this.initialize(vectors[0].length);
     }
-    console.log("after this.isInitialized", this.isInitialized);
 
     const queryStr = this.buildInsertQuery(vectors, documents);
-    // console.log("queryStr", queryStr)
     await this.client.exec({ query: queryStr });
   }
 
@@ -164,13 +149,11 @@ export class ClickHouseStore extends VectorStore {
       data: { document: string; metadata: object; dist: number }[];
     } = await queryResultSet.json();
 
-    console.log("queryResult", queryResult);
     const result: [Document, number][] = queryResult.data.map((item) => [
       new Document({ pageContent: item.document, metadata: item.metadata }),
       item.dist,
     ]);
 
-    console.log("result", result);
     return result;
   }
 
@@ -197,7 +180,6 @@ export class ClickHouseStore extends VectorStore {
       });
       docs.push(newDoc);
     }
-    console.log("docs", docs);
     return ClickHouseStore.fromDocuments(docs, embeddings, args);
   }
 
@@ -214,9 +196,7 @@ export class ClickHouseStore extends VectorStore {
     args: ClickHouseLibArgs
   ): Promise<ClickHouseStore> {
     const instance = new this(embeddings, args);
-    console.log("instance", instance);
     await instance.addDocuments(docs);
-    console.log("after add docs");
     return instance;
   }
 
@@ -245,13 +225,11 @@ export class ClickHouseStore extends VectorStore {
   private async initialize(dimension?: number): Promise<void> {
     const dim = dimension ?? (await this.embeddings.embedQuery("test")).length;
 
-    console.log("this.indexParam", this.indexParam);
     const indexParamStr = this.indexParam
       ? Object.entries(this.indexParam)
           .map(([key, value]) => `'${key}', ${value}`)
           .join(", ")
       : "";
-    console.log("indexParamStr", indexParamStr);
 
     const query = `
     CREATE TABLE IF NOT EXISTS ${this.database}.${this.table}(
@@ -264,8 +242,6 @@ export class ClickHouseStore extends VectorStore {
       INDEX vec_idx ${this.columnMap.embedding} TYPE ${this.indexType}(${indexParamStr}) GRANULARITY 1000
     ) ENGINE =  MergeTree ORDER BY ${this.columnMap.uuid} SETTINGS index_granularity = 8192;`;
 
-    console.log("after query", query);
-
     await this.client.exec({
       query: query,
       clickhouse_settings: {
@@ -274,7 +250,6 @@ export class ClickHouseStore extends VectorStore {
       },
     });
     this.isInitialized = true;
-    console.log("end initialize");
   }
 
   /**
@@ -285,28 +260,29 @@ export class ClickHouseStore extends VectorStore {
    * @returns The SQL query string.
    */
   private buildInsertQuery(vectors: number[][], documents: Document[]): string {
-    // const columnsStr = Object.values(this.columnMap).join(", ");
+    const columnsStr = Object.values(
+      Object.fromEntries(
+        Object.entries(this.columnMap).filter(([key]) => key !== this.columnMap.uuid)
+      )
+    ).join(", ");
 
     const data: string[] = [];
     for (let i = 0; i < vectors.length; i += 1) {
       const vector = vectors[i];
       const document = documents[i];
       const item = [
-        // TODO: id having issue, id, document, embedding, metadata, uuid
         `'${uuid.v4()}'`,
         `'${this.escapeString(document.pageContent)}'`,
         `[${vector}]`,
         `'${JSON.stringify(document.metadata)}'`,
-        // `'${uuid.v4()}'`,
       ].join(", ");
       data.push(`(${item})`);
     }
     const dataStr = data.join(", ");
 
-    console.log("end buildInsertQuery");
     return `
       INSERT INTO TABLE
-        ${this.database}.${this.table}("id", "document", "embedding", "metadata")
+        ${this.database}.${this.table}(${columnsStr})
       VALUES
         ${dataStr}
     `;

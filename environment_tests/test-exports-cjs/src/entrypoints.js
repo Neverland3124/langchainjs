@@ -31,7 +31,6 @@ const llms_fireworks = require("langchain/llms/fireworks");
 const llms_yandex = require("langchain/llms/yandex");
 const llms_fake = require("langchain/llms/fake");
 const prompts = require("langchain/prompts");
-const vectorstores_clickhouse = require("langchain/vectorstores/clickhouse");
 const vectorstores_base = require("langchain/vectorstores/base");
 const vectorstores_memory = require("langchain/vectorstores/memory");
 const vectorstores_prisma = require("langchain/vectorstores/prisma");

@@ -31,7 +31,6 @@ import * as llms_fireworks from "langchain/llms/fireworks";
 import * as llms_yandex from "langchain/llms/yandex";
 import * as llms_fake from "langchain/llms/fake";
 import * as prompts from "langchain/prompts";
-import * as vectorstores_clickhouse from "langchain/vectorstores/clickhouse";
 import * as vectorstores_base from "langchain/vectorstores/base";
 import * as vectorstores_memory from "langchain/vectorstores/memory";
 import * as vectorstores_prisma from "langchain/vectorstores/prisma";

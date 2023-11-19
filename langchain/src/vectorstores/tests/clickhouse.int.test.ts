@@ -22,6 +22,9 @@ test("ClickHouseStore.fromText", async () => {
     }
   );
 
+  // Sleep 1 second to ensure that the search occurs after the successful insertion of data.
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
   const results = await vectorStore.similaritySearch("hello world", 1);
   expect(results).toEqual([
     new Document({
@@ -41,50 +44,53 @@ test("ClickHouseStore.fromText", async () => {
   ]);
 });
 
-// test("ClickHouseStore.fromExistingIndex", async () => {
-//   await ClickHouseStore.fromTexts(
-//     ["Hello world", "Bye bye", "hello nice world"],
-//     [
-//       { id: 2, name: "2" },
-//       { id: 1, name: "1" },
-//       { id: 3, name: "3" },
-//     ],
-//     new HuggingFaceInferenceEmbeddings(),
-//     {
-//       host: process.env.CLICKHOUSE_HOST || "localhost",
-//       port: process.env.CLICKHOUSE_PORT || "8443",
-//       username: process.env.CLICKHOUSE_USERNAME || "username",
-//       password: process.env.CLICKHOUSE_PASSWORD || "password",
-//       table: "test_table",
-//     }
-//   );
+test("ClickHouseStore.fromExistingIndex", async () => {
+  await ClickHouseStore.fromTexts(
+    ["Hello world", "Bye bye", "hello nice world"],
+    [
+      { id: 2, name: "2" },
+      { id: 1, name: "1" },
+      { id: 3, name: "3" },
+    ],
+    new HuggingFaceInferenceEmbeddings(),
+    {
+      host: process.env.CLICKHOUSE_HOST || "localhost",
+      port: process.env.CLICKHOUSE_PORT || "8443",
+      username: process.env.CLICKHOUSE_USERNAME || "username",
+      password: process.env.CLICKHOUSE_PASSWORD || "password",
+      table: "test_table",
+    }
+  );
 
-//   const vectorStore = await ClickHouseStore.fromExistingIndex(
-//     new HuggingFaceInferenceEmbeddings(),
-//     {
-//       host: process.env.CLICKHOUSE_HOST || "localhost",
-//       port: process.env.CLICKHOUSE_PORT || "8443",
-//       username: process.env.CLICKHOUSE_USERNAME || "username",
-//       password: process.env.CLICKHOUSE_PASSWORD || "password",
-//       table: "test_table",
-//     }
-//   );
+  const vectorStore = await ClickHouseStore.fromExistingIndex(
+    new HuggingFaceInferenceEmbeddings(),
+    {
+      host: process.env.CLICKHOUSE_HOST || "localhost",
+      port: process.env.CLICKHOUSE_PORT || "8443",
+      username: process.env.CLICKHOUSE_USERNAME || "username",
+      password: process.env.CLICKHOUSE_PASSWORD || "password",
+      table: "test_table",
+    }
+  );
+  
+  // Sleep 1 second to ensure that the search occurs after the successful insertion of data.
+  await new Promise(resolve => setTimeout(resolve, 1000));
 
-//   const results = await vectorStore.similaritySearch("hello world", 1);
-//   expect(results).toEqual([
-//     new Document({
-//       pageContent: "Hello world",
-//       metadata: { id: 2, name: "2" },
-//     }),
-//   ]);
+  const results = await vectorStore.similaritySearch("hello world", 1);
+  expect(results).toEqual([
+    new Document({
+      pageContent: "Hello world",
+      metadata: { id: 2, name: "2" },
+    }),
+  ]);
 
-//   const filteredResults = await vectorStore.similaritySearch("hello world", 1, {
-//     whereStr: "metadata.name = '1'",
-//   });
-//   expect(filteredResults).toEqual([
-//     new Document({
-//       pageContent: "Bye bye",
-//       metadata: { id: 1, name: "1" },
-//     }),
-//   ]);
-// });
+  const filteredResults = await vectorStore.similaritySearch("hello world", 1, {
+    whereStr: "metadata.name = '1'",
+  });
+  expect(filteredResults).toEqual([
+    new Document({
+      pageContent: "Bye bye",
+      metadata: { id: 1, name: "1" },
+    }),
+  ]);
+});
