@@ -19,4 +19,4 @@ console.log(results);
 const filteredResults = await vectorStore.similaritySearch("hello world", 1, {
   whereStr: "metadata.name = '1'",
 });
-console.log(filteredResults);
+console.log(filteredResults); 
